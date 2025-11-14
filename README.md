@@ -1,7 +1,7 @@
-Praktisk Examination – Chatklient med Socket.IO
+## Praktisk Examination – Chatklient med Socket.IO
 (Konsolapp)
 
-## Se pdf för instruktioner.
+Se pdf för instruktioner.
 
 Praktisk Examination – Chatklient med Socket.IO
 (Konsolapp)
