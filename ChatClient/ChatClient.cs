@@ -19,7 +19,7 @@ namespace ChatClientApp
 
             _socket = new SocketIO(serverUrl, new SocketIOOptions
             {
-                Path = "/sys25d"
+                Path = "/sys25d",
                 Transport = SocketIOClient.Transport.TransportProtocol.WebSocket
             });
 
