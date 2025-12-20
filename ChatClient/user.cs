@@ -2,19 +2,11 @@ namespace ChatClientApp
 {
     public class User
     {
-        public string Username { get; set; }
+        public string Username { get; }
 
         public User(string username)
         {
-            if (string.IsNullOrWhiteSpace(username))
-                Username = "Anonymous";
-            else
-                Username = username;
-        }
-
-        public void PrintUsername()
-        {
-            System.Console.WriteLine("User: " + Username);
+            Username = username;
         }
     }
 }

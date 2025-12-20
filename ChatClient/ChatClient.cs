@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using System.Text.Json.Nodes;
 using SocketIOClient;
-using SocketIOClient.Transport;
 
 namespace ChatClientApp
 {
@@ -31,137 +30,103 @@ namespace ChatClientApp
             _socket.OnConnected += async (_, _) =>
             {
                 Console.WriteLine("Connected to server.");
-
-                try
-                {
-                    await _socket.EmitAsync("join", new { username = _user.Username });
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error sending join event: " + ex.Message);
-                }
+                await _socket.EmitAsync("join", new { username = _user.Username });
             };
 
-            _socket.OnDisconnected += (_, _) =>
+            _socket.On("join", r =>
             {
-                Console.WriteLine("Disconnected from server.");
-            };
-
-            _socket.On("chat_message", response =>
-            {
-                try
-                {
-                    var obj = response.GetValue<JsonObject>();
-                    string sender = obj["username"]?.ToString() ?? "Unknown";
-                    string text = obj["message"]?.ToString() ?? "";
-                    string time = obj["time"]?.ToString() ?? DateTime.Now.ToString("HH:mm");
-
-                    Console.WriteLine($"[{time}] {sender}: {text}");
-
-                    _history.Add(new Message
-                    {
-                        Sender = sender,
-                        Text = text,
-                        Timestamp = DateTime.Now
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("chat_message handler failed: " + ex.Message);
-                }
+                string name = GetUsername(r);
+                if (name != _user.Username)
+                    PrintSystem($"*** {name} joined the chat ***");
             });
 
-            _socket.OnAny((eventName, response) =>
+            _socket.On("leave", r =>
             {
-                try
-                {
-                    Console.WriteLine($"ON_ANY -> {eventName}: {response}");
-                }
-                catch { }
+                string name = GetUsername(r);
+                PrintSystem($"*** {name} left the chat ***");
             });
 
-            _socket.OnError += (_, error) =>
+            _socket.On("chat_message", r =>
             {
-                Console.WriteLine("Socket.IO error: " + error);
-            };
+                var obj = r.GetValue<JsonObject>();
+                string sender = obj["username"]?.ToString() ?? "Unknown";
+                string text = obj["message"]?.ToString() ?? "";
+                string time = obj["time"]?.ToString() ?? DateTime.Now.ToString("HH:mm");
+
+                Console.WriteLine($"[{time}] {sender}: {text}");
+
+                _history.Add(new Message
+                {
+                    Sender = sender,
+                    Text = text,
+                    Timestamp = DateTime.Now
+                });
+            });
+        }
+
+        private void PrintSystem(string text)
+        {
+            Console.WriteLine(text);
+            _history.Add(new Message
+            {
+                Sender = "System",
+                Text = text,
+                Timestamp = DateTime.Now
+            });
+        }
+
+        private static string GetUsername(SocketIOResponse r)
+        {
+            try
+            {
+                var obj = r.GetValue<JsonObject>();
+                return obj["username"]?.ToString() ?? "Unknown";
+            }
+            catch
+            {
+                try { return r.GetValue<string>(); }
+                catch { return "Unknown"; }
+            }
         }
 
         public async Task ConnectAsync()
         {
-            try
-            {
-                Console.WriteLine("Connecting...");
-                await _socket.ConnectAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("ConnectAsync failed: " + ex.Message);
-            }
+            Console.WriteLine("Connecting...");
+            await _socket.ConnectAsync();
         }
 
         public async Task SendMessageAsync(string text)
         {
-            if (string.IsNullOrWhiteSpace(text)) return;
-
-            var payload = new
+            await _socket.EmitAsync("chat_message", new
             {
                 username = _user.Username,
                 message = text,
                 time = DateTime.Now.ToString("HH:mm")
-            };
-
-            try
-            {
-                await _socket.EmitAsync("chat_message", payload);
-                Console.WriteLine("You: " + text);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error sending chat_message: " + ex.Message);
-            }
-
-            _history.Add(new Message
-            {
-                Sender = _user.Username,
-                Text = text,
-                Timestamp = DateTime.Now
             });
+
+            Console.WriteLine($"You: {text}");
         }
 
         public async Task SendPrivateMessageAsync(string recipient, string text)
         {
-            if (string.IsNullOrWhiteSpace(recipient) || string.IsNullOrWhiteSpace(text)) return;
-
-            var payload = new
+            await _socket.EmitAsync("private_message", new
             {
                 from = _user.Username,
                 to = recipient,
-                message = text,
-                time = DateTime.Now.ToString("HH:mm")
-            };
-
-            try
-            {
-                await _socket.EmitAsync("private_message", payload);
-                Console.WriteLine($"(DM to {recipient}) {text}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error sending private_message: " + ex.Message);
-            }
-
-            _history.Add(new Message
-            {
-                Sender = _user.Username,
-                Recipient = recipient,
-                Text = text,
-                IsPrivate = true,
-                Timestamp = DateTime.Now
+                message = text
             });
+
+            Console.WriteLine($"(DM to {recipient}) {text}");
         }
 
         public async Task DisconnectAsync()
         {
+            try
+            {
+                await _socket.EmitAsync("leave", new { username = _user.Username });
+            }
+            catch { }
+
             try
             {
                 await _socket.DisconnectAsync();
