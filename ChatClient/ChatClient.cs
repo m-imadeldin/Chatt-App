@@ -122,6 +122,9 @@ namespace ChatClientApp
 
         public async Task DisconnectAsync()
         {
+            // 👇 NYTT: visa lokal leave alltid
+            Console.WriteLine($"*** {_user.Username} left the chat ***");
+
             try
             {
                 await _socket.EmitAsync("leave", new { username = _user.Username });
