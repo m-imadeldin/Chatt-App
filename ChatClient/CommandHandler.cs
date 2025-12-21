@@ -5,8 +5,8 @@ namespace ChatClientApp
 {
     public class CommandHandler
     {
-        private ChatClient _client;
-        private MessageHistory _history;
+        private readonly ChatClient _client;
+        private readonly MessageHistory _history;
 
         public CommandHandler(ChatClient client, MessageHistory history)
         {
@@ -16,53 +16,44 @@ namespace ChatClientApp
 
         public async Task HandleAsync(string input)
         {
-            if (!input.StartsWith("/")) return;
+            var parts = input.Split(' ', 3);
+            var command = parts[0].ToLower();
 
-            string[] parts = input.Split(' ', 3, StringSplitOptions.RemoveEmptyEntries);
-            string command = parts.Length > 0 ? parts[0].ToLower() : "";
+            switch (command)
+            {
+                case "/help":
+                    ShowHelp();
+                    break;
 
-            if (command == "/help")
-            {
-                ShowHelp();
-            }
-            else if (command == "/quit")
-            {
-                Console.WriteLine("Exiting program...");
-                await _client.DisconnectAsync();
-                Environment.Exit(0);
-            }
-            else if (command == "/history")
-            {
-                int count = 20;
-                if (parts.Length > 1 && int.TryParse(parts[1], out var n))
-                    count = n;
-                _history.ShowLast(count);
-            }
-            else if (command == "/dm")
-            {
-                if (parts.Length < 3)
-                {
-                    Console.WriteLine("Usage: /dm <user> <text>");
-                    return;
-                }
-                string recipient = parts[1];
-                string text = parts[2];
-                await _client.SendPrivateMessageAsync(recipient, text);
-            }
-            else
-            {
-                Console.WriteLine("Unknown command. Type /help for list.");
+                case "/quit":
+                    await _client.DisconnectAsync();
+                    Environment.Exit(0);
+                    break;
+
+                case "/history":
+                    int n = parts.Length > 1 && int.TryParse(parts[1], out var x) ? x : 20;
+                    _history.ShowLast(n);
+                    break;
+
+                case "/dm":
+                    if (parts.Length < 3)
+                        Console.WriteLine("Usage: /dm <user> <text>");
+                    else
+                        await _client.SendPrivateMessageAsync(parts[1], parts[2]);
+                    break;
+
+                default:
+                    Console.WriteLine("Unknown command. Type /help.");
+                    break;
             }
         }
 
         private void ShowHelp()
         {
-            Console.WriteLine("--- Commands ---");
-            Console.WriteLine("/help        - show this help");
-            Console.WriteLine("/quit        - exit the program");
-            Console.WriteLine("/history [n] - show last n messages");
-            Console.WriteLine("/dm <user> <text> - send direct message");
-            Console.WriteLine("----------------");
+            Console.WriteLine("/help          Show commands");
+            Console.WriteLine("/quit          Exit program");
+            Console.WriteLine("/history [n]   Show last messages");
+            Console.WriteLine("/dm <u> <msg>  Direct message");
         }
     }
 }

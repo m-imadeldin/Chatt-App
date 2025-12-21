@@ -1,71 +1,42 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 
 namespace ChatClientApp
 {
     public class MessageHistory
     {
-        private const string HistoryFile = "chat_history.json";
-        private List<Message> _messages;
+        private const string FileName = "chat_history.json";
+        private readonly List<Message> _messages = new();
 
-        public MessageHistory()
+        public void Add(Message message)
         {
-            _messages = new List<Message>();
+            _messages.Add(message);
+            Save();
         }
 
-        public void Add(Message msg)
+        public void ShowLast(int count)
         {
-            _messages.Add(msg);
-            Save();
+            foreach (var msg in _messages.TakeLast(count))
+                Console.WriteLine(msg);
         }
 
         public void Save()
         {
-            try
-            {
-                string json = JsonSerializer.Serialize(_messages);
-                File.WriteAllText(HistoryFile, json);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error saving message history: " + ex.Message);
-            }
+            var json = JsonSerializer.Serialize(_messages, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(FileName, json);
         }
 
         public void Load()
         {
-            if (!File.Exists(HistoryFile))
-            {
-                Console.WriteLine("No previous chat history found.");
-                return;
-            }
+            if (!File.Exists(FileName)) return;
 
-            try
-            {
-                string json = File.ReadAllText(HistoryFile);
-                List<Message>? loadedMessages = JsonSerializer.Deserialize<List<Message>>(json);
-                if (loadedMessages != null)
-                    _messages.AddRange(loadedMessages);
+            var json = File.ReadAllText(FileName);
+            var messages = JsonSerializer.Deserialize<List<Message>>(json);
 
-                Console.WriteLine("Chat history loaded (" + _messages.Count + " messages).");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error loading message history: " + ex.Message);
-            }
-        }
-
-        public void ShowLast(int count = 20)
-        {
-            Console.WriteLine("--- Last " + count + " messages ---");
-            int start = Math.Max(_messages.Count - count, 0);
-            for (int i = start; i < _messages.Count; i++)
-            {
-                Console.WriteLine(_messages[i].ToString());
-            }
-            Console.WriteLine("-----------------------------");
+            if (messages != null)
+                _messages.AddRange(messages);
         }
     }
 }
