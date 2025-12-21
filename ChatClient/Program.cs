@@ -34,7 +34,7 @@ namespace ChatClientApp
 
             while (true)
             {
-                string? input = Console.ReadLine();
+                var input = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(input)) continue;
 
                 if (input.StartsWith("/"))

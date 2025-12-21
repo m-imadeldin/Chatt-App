@@ -30,6 +30,7 @@ namespace ChatClientApp
             _socket.OnConnected += async (_, _) =>
             {
                 Console.WriteLine("Connected to server.");
+                Console.WriteLine($"*** {_user.Username} joined the chat ***");
                 await _socket.EmitAsync("join", new { username = _user.Username });
             };
 
