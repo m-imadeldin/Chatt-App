@@ -1,0 +1,42 @@
+[
+  {
+    "Sender": "Mohammed",
+    "Text": "Hello!",
+    "Timestamp": "2025-11-15T16:39:59.7339222+01:00"
+  },
+  {
+    "Sender": "Mohammed",
+    "Text": "SHooo",
+    "Timestamp": "2025-11-15T16:41:43.0700053+01:00"
+  },
+  {
+    "Sender": "System",
+    "Text": "*** ADAM joined the chat ***",
+    "Timestamp": "2025-12-21T11:14:46.5391008+01:00"
+  },
+  {
+    "Sender": "ADAM",
+    "Text": "Hej",
+    "Timestamp": "2025-12-21T11:15:00.3851174+01:00"
+  },
+  {
+    "Sender": "System",
+    "Text": "*** adam joined the chat ***",
+    "Timestamp": "2025-12-21T11:25:54.9527348+01:00"
+  },
+  {
+    "Sender": "adam",
+    "Text": "hej",
+    "Timestamp": "2025-12-21T11:25:57.8203659+01:00"
+  },
+  {
+    "Sender": "Adam",
+    "Text": "ye",
+    "Timestamp": "2025-12-21T11:32:30.3762934+01:00"
+  },
+  {
+    "Sender": "System",
+    "Text": "*** Adam left the chat ***",
+    "Timestamp": "2025-12-21T11:32:39.7796693+01:00"
+  }
+]

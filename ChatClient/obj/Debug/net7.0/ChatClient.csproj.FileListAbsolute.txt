@@ -1,0 +1,6 @@
+C:\Users\Mohammed\RiderProjects\Chatt.App\ChatClient\obj\Debug\net7.0\ChatClient.csproj.AssemblyReference.cache
+C:\Users\Mohammed\RiderProjects\Chatt.App\ChatClient\obj\Debug\net7.0\ChatClient.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Mohammed\RiderProjects\Chatt.App\ChatClient\obj\Debug\net7.0\ChatClient.AssemblyInfoInputs.cache
+C:\Users\Mohammed\RiderProjects\Chatt.App\ChatClient\obj\Debug\net7.0\ChatClient.AssemblyInfo.cs
+C:\Users\Mohammed\RiderProjects\Chatt.App\ChatClient\obj\Debug\net7.0\ChatClient.csproj.CoreCompileInputs.cache
+C:\Users\Mohammed\RiderProjects\Chatt.App\ChatClient\obj\Debug\net7.0\ChatClient.sourcelink.json
